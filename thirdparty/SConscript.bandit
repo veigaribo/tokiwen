@@ -1,0 +1,98 @@
+Import('env')
+
+headers = Split('''
+  bandit/bandit/controller.h
+  bandit/bandit/reporters.h
+  bandit/bandit/grammar.h
+  bandit/bandit/runner.h
+  bandit/bandit/options.h
+  bandit/bandit/external/optionparser.h
+  bandit/bandit/test_run_error.h
+  bandit/bandit/run_policies.h
+  bandit/bandit/registration/registrar.h
+  bandit/bandit/registration/spec_registry.h
+  bandit/bandit/colorizers.h
+  bandit/bandit/colorizers/light.h
+  bandit/bandit/colorizers/backend.h
+  bandit/bandit/colorizers/dark.h
+  bandit/bandit/colorizers/interface.h
+  bandit/bandit/colorizers/off.h
+  bandit/bandit/run_policies/never.h
+  bandit/bandit/run_policies/interface.h
+  bandit/bandit/run_policies/filter_chain.h
+  bandit/bandit/run_policies/bandit.h
+  bandit/bandit/run_policies/always.h
+  bandit/bandit/adapters.h
+  bandit/bandit/adapters/interface.h
+  bandit/bandit/adapters/snowhouse.h
+  bandit/bandit/bandit.h
+  bandit/bandit/assertion_exception.h
+  bandit/bandit/version.h
+  bandit/bandit/failure_formatters.h
+  bandit/bandit/failure_formatters/posix.h
+  bandit/bandit/failure_formatters/visual_studio.h
+  bandit/bandit/failure_formatters/interface.h
+  bandit/bandit/failure_formatters/generic.h
+  bandit/bandit/failure_formatters/qt_creator.h
+  bandit/bandit/context.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/constraintlist.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/operators/collections/exactlyoperator.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/operators/collections/noneoperator.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/operators/collections/atleastoperator.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/operators/collections/alloperator.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/operators/collections/collectionoperator.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/operators/collections/collectionconstraintevaluator.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/operators/collections/atmostoperator.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/operators/invalidexpressionexception.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/operators/constraintoperator.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/operators/oroperator.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/operators/notoperator.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/operators/andoperator.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/fluent.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/expressionbuilder.h
+  bandit/bandit/assertion_frameworks/snowhouse/fluent/constraintadapter.h
+  bandit/bandit/assertion_frameworks/snowhouse/exceptions.h
+  bandit/bandit/assertion_frameworks/snowhouse/stringizers.h
+  bandit/bandit/assertion_frameworks/snowhouse/assertionexception.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/equalswithdeltaconstraint.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/constraints.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/fulfillsconstraint.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/expressions/expression_fwd.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/expressions/notexpression.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/expressions/andexpression.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/expressions/orexpression.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/expressions/expression.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/equalscontainerconstraint.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/isgreaterthanconstraint.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/containsconstraint.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/islessthanorequaltoconstraint.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/haslengthconstraint.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/equalsconstraint.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/startswithconstraint.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/isgreaterthanorequaltoconstraint.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/islessthanconstraint.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/isemptyconstraint.h
+  bandit/bandit/assertion_frameworks/snowhouse/constraints/endswithconstraint.h
+  bandit/bandit/assertion_frameworks/snowhouse/stringize.h
+  bandit/bandit/assertion_frameworks/snowhouse/snowhouse.h
+  bandit/bandit/assertion_frameworks/snowhouse/assert.h
+  bandit/bandit/assertion_frameworks/snowhouse/macros.h
+  bandit/bandit/reporters/colored_base.h
+  bandit/bandit/reporters/progress_base.h
+  bandit/bandit/reporters/interface.h
+  bandit/bandit/reporters/info.h
+  bandit/bandit/reporters/summary.h
+  bandit/bandit/reporters/crash.h
+  bandit/bandit/reporters/singleline.h
+  bandit/bandit/reporters/spec.h
+  bandit/bandit/reporters/xunit.h
+  bandit/bandit/reporters/dots.h
+''')
+
+# strip the first 'bandit/'
+targets = [f'#build/tests/include/{header[7:]}' for header in headers]
+
+env.InstallAs(targets, headers)
+
+result = env.wrapup_conscript(libs=[], headers=[])
+Return('result')

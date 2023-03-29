@@ -1,0 +1,42 @@
+import platforms
+
+Import('env')
+
+lib_sources = Split('''
+  RE-flex/unicode/letter_scripts.cpp
+  RE-flex/unicode/language_scripts.cpp
+  RE-flex/unicode/block_scripts.cpp
+  RE-flex/lib/convert.cpp
+  RE-flex/lib/error.cpp
+  RE-flex/lib/pattern.cpp
+  RE-flex/lib/matcher_avx512bw.cpp
+  RE-flex/lib/unicode.cpp
+  RE-flex/lib/utf8.cpp
+  RE-flex/lib/input.cpp
+  RE-flex/lib/simd_avx512bw.cpp
+  RE-flex/lib/debug.cpp
+  RE-flex/lib/matcher.cpp
+  RE-flex/lib/simd_avx2.cpp
+  RE-flex/lib/matcher_avx2.cpp
+  RE-flex/lib/posix.cpp
+''')
+
+# we could build the binary if we wanted to
+bin_sources = Split('''
+  RE-flex/src/reflex.cpp
+''')
+
+bin_libs = Split('''
+  #lib/libreflex
+''')
+
+include = Split('''
+  RE-flex/include/
+  RE-flex/fuzzy/
+  RE-flex/src/
+''')
+
+libreflex = env.StaticLibrary('reflex', lib_sources, CPPPATH=include)
+
+result = env.wrapup_conscript(libs=[libreflex], headers=[])
+Return('result')

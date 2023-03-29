@@ -1,0 +1,12 @@
+Import('env')
+
+liblex, lex_headers = SConscript('lex/SConscript')
+libsyntax, syntax_headers = SConscript('syntax/SConscript')
+
+libparser = env.StaticLibrary('parser', Glob('*.cpp'), LIBS=[libsyntax])
+
+libs = [liblex, libsyntax, libparser]
+headers = Glob('*.h') + lex_headers + syntax_headers
+
+result = env.wrapup_conscript(libs=libs, headers=headers)
+Return('result')

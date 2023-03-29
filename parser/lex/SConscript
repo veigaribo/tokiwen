@@ -1,0 +1,26 @@
+Import('env')
+
+impl_output = File('scanner.cpp')
+header_output = File('scanner.hpp')
+
+reflex_flags = [
+  '--flex',
+  '--bison-complete',
+  '--bison-locations',
+  '--reentrant',
+]
+
+scanner = env.CXXFile(
+  impl_output,
+  'scanner.ll',
+  LEXFLAGS=reflex_flags,
+  LEX_HEADER_FILE=header_output,
+)
+
+sources = Glob('*.cpp')
+
+liblex = env.StaticLibrary('lex', sources)
+env.Depends(liblex, scanner)
+
+result = env.wrapup_conscript(libs=[liblex], headers=Glob('*.h'))
+Return('result')

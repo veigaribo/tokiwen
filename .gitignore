@@ -1,0 +1,35 @@
+# clangd
+.cache/
+
+# scons
+config.log
+.sconsign.dblite
+.sconf_temp/
+
+# python that e.g. scons uses
+__pycache__/
+
+# js/ts
+node_modules/
+.log/
+.parcel-cache/
+
+# clang
+compile_commands.json
+
+# cc
+*.o
+*.a
+*.so
+*.dll
+*.lib
+
+# our own
+build/
+bin/
+include/
+lib/
+editor/dist/
+
+# user-specific
+custom.py

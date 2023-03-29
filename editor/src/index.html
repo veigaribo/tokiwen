@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>Tokiwen</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+      h1 {
+        margin: 3px;
+        font-size: 16pt;
+      }
+      table {
+        border: 1px solid darkgrey;
+        min-width: 100%;
+      }
+      hr {
+        width: 100%;
+      }
+      #current-line {
+        position: fixed;
+        top: 3px;
+      }
+      #settings {
+        border: 1px solid darkgrey;
+        padding: 1em;
+        margin-bottom: 1em;
+        height: 0;
+        display: none;
+        transition: height 0.3s;
+        overflow-y: scroll;
+      }
+      #code-textarea {
+        height: 92vh;
+      }
+      .lr {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      .lr-wrap {
+        flex-flow: row wrap;
+      }
+      .lr-scroll {
+        width: 100%;
+        overflow-x: scroll;
+        gap: 1em;
+      }
+      .td {
+        display: flex;
+        flex-direction: column;
+      }
+      .table-wrapper {
+        max-height: 95vh;
+        overflow-y: scroll;
+      }
+      .td-but-lr-if-large {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      #cockpit {
+        padding: 3px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+      }
+
+      @media screen and (min-width: 1080px) {
+        .small-only {
+          display: none;
+        }
+        .td-but-lr-if-large {
+          flex-direction: row;
+        }
+        .lr-scroll {
+          width: auto;
+        }
+        #code-textarea {
+          height: 75vh;
+        }
+        #current-line {
+          position: relative;
+        }
+        #cockpit {
+          position: relative;
+        }
+      }
+
+      #bottom-spacer {
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="td-but-lr-if-large">
+      <div class="td">
+        <div class="lr">
+          <div class="lr lr-wrap" id="current-line"></div>
+          <div class="small-only"></div>
+          <div><button id="toggle-config">Configurações</button></div>
+        </div>
+
+        <div id="settings">
+          <div class="lr">
+            <label>Sempre reiniciar antes de compilar</label>
+            <input type="checkbox" id="compile-resets" checked />
+          </div>
+
+          <h1>Palavras-chave</h1>
+
+          <form>
+            <div class="td">
+              <label
+                >Palavra-chave para condicional caso positivo (padrão:
+                <i>if</i>)</label
+              >
+              <input id="kw-if" value="if" />
+              <label
+                >Palavra-chave para condicional caso negativo (padrão:
+                <i>else</i>)</label
+              >
+              <input id="kw-else" value="else" />
+              <label>Palavra-chave de loop (padrão: <i>while</i>)</label>
+              <input id="kw-while" value="while" />
+              <label
+                >Palavra-chave para salto para label (padrão:
+                <i>goto</i>)</label
+              >
+              <input id="kw-goto" value="goto" />
+              <label>Palavra-chave de output (padrão: <i>write</i>)</label>
+              <input id="kw-write" value="write" />
+              <label>Palavra-chave de input (padrão: <i>read</i>)</label>
+              <input id="kw-read" value="read" />
+              <label
+                >Palavra-chave para booleano verdadeiro (padrão:
+                <i>true</i>)</label
+              >
+              <input id="kw-true" value="true" />
+              <label
+                >Palavra-chave para booleano falso (padrão: <i>false</i>)</label
+              >
+              <input id="kw-false" value="false" />
+            </div>
+          </form>
+        </div>
+
+        <textarea id="code-textarea"></textarea>
+
+        <div class="lr lr-wrap" id="cockpit">
+          <button id="compile">Compilar</button>
+          <button id="run-all">Executar todo</button>
+          <button id="run-statement">Executar statement</button>
+          <button id="run-instruction">Executar instrução</button>
+          <button id="undo-statement">Desfazer statement</button>
+          <button id="undo-instruction">Desfazer instrução</button>
+          <button id="reset">Reiniciar</button>
+        </div>
+        <p id="log"></p>
+
+        <h1>Input / Output</h1>
+        <div class="lr lr-wrap">
+          <form>
+            <div class="td">
+              <label>Input</label>
+              <div class="lr lr-wrap">
+                <input id="input" type="number" />
+                <button id="input-btn" type="button" disabled>Enviar</button>
+              </div>
+            </div>
+          </form>
+          <form>
+            <div class="td">
+              <label>Output</label>
+              <input id="output" type="number" disabled />
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <hr class="small-only" />
+
+      <div class="lr lr-scroll">
+        <div class="td">
+          <h1>Variáveis</h1>
+          <div class="table-wrapper">
+            <table id="variables-table"></table>
+          </div>
+        </div>
+        <div class="td">
+          <h1>Instruções</h1>
+          <div class="table-wrapper">
+            <table id="instruction-table"></table>
+          </div>
+        </div>
+        <div class="td">
+          <h1>Registradores</h1>
+          <div class="table-wrapper">
+            <table id="register-table"></table>
+          </div>
+        </div>
+        <div class="td">
+          <h1>Memória</h1>
+          <div class="table-wrapper">
+            <table id="mem-table"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="bottom-spacer" class="small-only"></div>
+
+    <script type="module">
+      import "./ts/main.ts";
+    </script>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "tokiwen-editor",
+  "version": "0.1.0",
+  "description": "Tokiwen web-based text editor and runtime environment",
+  "source": "src/index.html",
+  "scripts": {
+    "start": "rimraf .parcel-cache && parcel",
+    "build": "rimraf .parcel-cache && parcel build",
+    "lint": "prettier --write tsconfig.json src/"
+  },
+  "keywords": [
+    "tokiwen"
+  ],
+  "author": "Gabriel Veiga <veigo@veigo.dev>",
+  "license": "MIT",
+  "devDependencies": {
+    "@parcel/validator-typescript": "^2.8.3",
+    "buffer": "^5.7.1",
+    "parcel": "^2.8.3",
+    "process": "^0.11.10",
+    "rimraf": "^5.0.1",
+    "typescript": "^5.0.4"
+  }
+}

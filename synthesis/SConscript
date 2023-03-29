@@ -1,0 +1,9 @@
+Import('env')
+
+libsynthesis = env.StaticLibrary('synthesis', Glob('*.cpp'))
+
+libs = [libsynthesis]
+headers = Glob('*.h')
+
+result = env.wrapup_conscript(libs=libs, headers=headers)
+Return('result')

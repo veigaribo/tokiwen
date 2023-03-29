@@ -1,0 +1,36 @@
+Import('env', 'private_libs_dir')
+
+# Bandit stuff & constraints.h
+# If we don't wrap the `.` SCons doesn't expand it in compile_commands.json, presumably
+# for some reason
+test_include = ['#thirdparty/bandit', Dir('.')]
+
+runner = ['runner.cpp']
+
+tests = []
+tests.extend(Glob('parser/*.cpp'))
+tests.extend(Glob('parser/lex/*.cpp'))
+tests.extend(Glob('parser/syntax/*.cpp'))
+tests.extend(Glob('full/*.cpp'))
+
+libs = ['tokiwen']
+link_flags = ['-static']
+
+if env['platform'] == 'web':
+  # exit cleanly
+  link_flags.append('-sEXIT_RUNTIME=1')
+  link_flags.append('-sENVIRONMENT=node')
+
+cpppath = (env.get('CPPPATH') or []) + test_include
+libs = (env.get('LIBS') or []) + libs
+linkflags = (env.get('LINKFLAGS') or []) + link_flags
+
+test_bin = env.Program(
+  'run',
+  source=runner + tests,
+  CPPPATH=cpppath,
+  LIBS=libs,
+  LINKFLAGS=linkflags,
+)
+
+print(f'Run tests: {test_bin[0].relpath}')

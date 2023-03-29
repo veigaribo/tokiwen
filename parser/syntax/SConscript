@@ -1,0 +1,26 @@
+Import('env')
+
+yacc_flags = [
+  '-Wcounterexamples',
+]
+
+env.Replace(YACC='bison')
+env.Append(YACCFLAGS=yacc_flags)
+
+bison_outputs = [
+  'parser.cpp',
+  'parser.hpp',
+  'location.hpp',
+  'position.hh',
+  'stack.hh'
+]
+
+parser = env.CXXFile(bison_outputs, 'grammar.yy')
+
+sources = Glob('*.cpp')
+
+libsyntax = env.StaticLibrary('syntax', sources)
+env.Depends(libsyntax, parser)
+
+result = env.wrapup_conscript(libs=[libsyntax], headers=Glob('*.{h,hpp}'))
+Return('result')
