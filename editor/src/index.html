@@ -21,6 +21,7 @@
       #current-line {
         position: fixed;
         top: 3px;
+        z-index: 999; /* To be in front of code mirror */
       }
       #settings {
         border: 1px solid darkgrey;
@@ -31,8 +32,9 @@
         transition: height 0.3s;
         overflow-y: scroll;
       }
-      #code-textarea {
+      .cm-editor {
         height: 92vh;
+        border: 1px solid darkgrey;
       }
       .lr {
         display: flex;
@@ -77,7 +79,7 @@
         .lr-scroll {
           width: auto;
         }
-        #code-textarea {
+        .cm-editor {
           height: 75vh;
         }
         #current-line {
@@ -146,7 +148,7 @@
           </form>
         </div>
 
-        <textarea id="code-textarea"></textarea>
+        <div id="code-wrapper"></div>
 
         <div class="lr lr-wrap" id="cockpit">
           <button id="compile">Compilar</button>

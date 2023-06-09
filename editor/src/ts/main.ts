@@ -7,9 +7,26 @@ import { RegisterTable } from "./ui/register-table";
 import { VariableTable } from "./ui/variable-table";
 import { Input, Output } from "./vm/io";
 import { LineIndicator } from "./ui/line-indicator";
+import { EditorView, basicSetup } from "codemirror";
+import { keymap, ViewUpdate } from "@codemirror/view";
+import { indentWithTab } from "@codemirror/commands";
 
 const settings = document.getElementById("settings") as HTMLInputElement;
-const textarea = document.getElementById("code-textarea") as HTMLInputElement;
+const codeWrapper = document.getElementById("code-wrapper")!;
+
+// Is changed later
+let onEditorChanged: (update: ViewUpdate) => void = () => {};
+
+const editor = new EditorView({
+  extensions: [
+    basicSetup,
+    keymap.of([indentWithTab]),
+    EditorView.updateListener.of((update) => {
+      onEditorChanged(update);
+    }),
+  ],
+  parent: codeWrapper,
+});
 
 const settingsBtn = document.getElementById(
   "toggle-config",
@@ -80,7 +97,8 @@ setup().then((wrapper) => {
   (window as any).tokiwen = tokiwen;
 
   function compile() {
-    const ast = parser.parse(textarea.value);
+    const source = editor.state.doc.toString();
+    const ast = parser.parse(source);
     const program = compiler.compile(ast.get());
 
     const currentProgram = cpu.getProgram();
@@ -134,11 +152,11 @@ setup().then((wrapper) => {
     }
   }
 
-  textarea.addEventListener("change", () => {
-    if (cpu.getProgram()) {
+  onEditorChanged = (update) => {
+    if (update.docChanged && cpu.getProgram()) {
       log.textContent = "O código foi alterado desde a última compilação.";
     }
-  });
+  };
 
   compileBtn.addEventListener("click", () => {
     try {
