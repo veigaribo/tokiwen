@@ -219,7 +219,10 @@ export class Cpu extends EventEmitter<CpuEvents> {
 
     do {
       await this.runOneInstruction();
-    } while (!this.instructionIsBoundary[Number(this.pc)]);
+    } while (
+      !this.instructionIsBoundary[Number(this.pc)] &&
+      this.pc < this.program.instructions.length
+    );
   }
 
   public undoOneInstruction() {

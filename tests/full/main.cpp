@@ -107,23 +107,23 @@ go_bandit([]() {
     it("program 4", [&]() {
       std::cout << "program 4\n";
       std::string input = "\
-        int x = 0; \
-        int vy = 1; \
-        \
-        loop:\
-        if (x < 10) { \
-          int x = 10; \
-          goto calc; \
-        } else { \
-          goto end;\
-        } \
-        \
-        calc:\
-        vy *= 2;\
-        goto loop;\
-        \
-        end:\
-        x = 100; \
+        int x = 0; \n\
+        int vy = 1; \n\
+        \n\
+        loop: \n\
+        if (x < 10) { \n\
+          int x = 10; \n\
+          goto calc; \n\
+        } else { \n\
+          goto end; \n\
+        } \n\
+        \n\
+        calc: \n\
+        vy *= 2; \n\
+        goto loop; \n\
+        \n\
+        end: \n\
+        x = 100; \n\
       ";
 
       parser p(input);
@@ -139,7 +139,8 @@ go_bandit([]() {
       std::cout << "code: \n";
       for (size_t i = 0; i < cresult.code.size(); ++i) {
         auto instruction = cresult.code[i];
-        std::cout << i << "> " << instruction << '\n';
+        auto line = cresult.metadata.source_line_map[i];
+        std::cout << i << "> " << instruction << " <- " << line << '\n';
       }
 
       std::cout << "statement boundaries\n";

@@ -27,9 +27,13 @@ export class InstructionTable {
     this.el.append(header);
   }
 
-  private makeTooltip(mnemonic: string, description: string): string {
+  private makeTooltipText(mnemonic: string, description: string): string {
+    return `${mnemonic}: ${description}`;
+  }
+
+  private makeTooltip(tooltipText: string): string {
     const tooltip = document.createElement("DIV");
-    tooltip.textContent = description;
+    tooltip.textContent = tooltipText;
     tooltip.style.display = "none";
     tooltip.style.position = "fixed";
     tooltip.style.top = "calc(3px + 1em + 3px + 1em + 3px)";
@@ -59,16 +63,22 @@ export class InstructionTable {
       this.el.removeChild(row);
     }
 
+    this.rows = new Map();
+
     let index = 0n;
     for (const instruction of instructions) {
       const newRow = document.createElement("TR");
       const description = instructionDescription[instruction.op()];
-      newRow.title = description;
+      const tooltipText = this.makeTooltipText(
+        instruction.mnemonic(),
+        description,
+      );
+      newRow.title = tooltipText;
 
       if (window.innerWidth < 1080) {
         newRow.tabIndex = 0; // To allow focus
 
-        const tooltip = this.makeTooltip(instruction.mnemonic(), description);
+        const tooltip = this.makeTooltip(tooltipText);
         newRow.setAttribute("data-tooltip", tooltip);
 
         newRow.addEventListener("focus", function () {

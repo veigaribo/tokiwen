@@ -194,8 +194,6 @@ void compiler::compile_expr(std::shared_ptr<ast_node> tree) {
   }
 
   auto result = this->data.pop_intermediate();
-  push_instruction(instruction_with_operand_placeholders(op::LOAD, result),
-                   tree->location);
 }
 
 void compiler::compile_expr_select(expr_component *expr) {
@@ -268,8 +266,6 @@ void compiler::compile_expr_unary_minus(expr_component *expr) {
                    expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_unary_plus(expr_component *expr) {}
@@ -284,8 +280,6 @@ void compiler::compile_expr_sum(expr_component *expr) {
                    expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_sub(expr_component *expr) {
@@ -299,8 +293,6 @@ void compiler::compile_expr_sub(expr_component *expr) {
       expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_mul(expr_component *expr) {
@@ -314,8 +306,6 @@ void compiler::compile_expr_mul(expr_component *expr) {
       expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_div(expr_component *expr) {
@@ -328,8 +318,6 @@ void compiler::compile_expr_div(expr_component *expr) {
                    expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_mod(expr_component *expr) {
@@ -343,13 +331,17 @@ void compiler::compile_expr_mod(expr_component *expr) {
       expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_var(expr_component *expr) {
   auto var_node = (var_identifier_node *)(expr->node);
   auto var_offset = var_node->entry->offset;
+
+  if (this->data.intermediate_stack_size() != 0) {
+    auto last = this->data.peek_intermediate();
+    push_instruction(instruction_with_operand_placeholders(op::SET, last),
+                     expr->node->location);
+  }
 
   push_instruction(
       instruction_with_operand_placeholders(op::LOAD, absolute(var_offset)),
@@ -365,8 +357,6 @@ void compiler::compile_expr_var(expr_component *expr) {
       expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_literal(expr_component *expr) {
@@ -393,16 +383,16 @@ void compiler::compile_expr_literal(expr_component *expr) {
     value = node->value;
     break;
   }
-  case type_kind::POINTER: {
-    // TODO
-    auto node = (int_literal_node *)(expr->node);
-    value = node->value;
-    break;
-  }
   default:
     std::cout << "Invalid type in expression " << expr->node->typ->kind << '\n';
     value = 0xBAD;
     break;
+  }
+
+  if (this->data.intermediate_stack_size() != 0) {
+    auto last = this->data.peek_intermediate();
+    push_instruction(instruction_with_operand_placeholders(op::SET, last),
+                     expr->node->location);
   }
 
   push_instruction(
@@ -410,8 +400,6 @@ void compiler::compile_expr_literal(expr_component *expr) {
       expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_assignment(expr_component *expr) {
@@ -445,8 +433,6 @@ void compiler::compile_expr_sum_assignment(expr_component *expr) {
       expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_subtraction_assignment(expr_component *expr) {
@@ -469,8 +455,6 @@ void compiler::compile_expr_subtraction_assignment(expr_component *expr) {
       expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_multiplication_assignment(expr_component *expr) {
@@ -493,8 +477,6 @@ void compiler::compile_expr_multiplication_assignment(expr_component *expr) {
       expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_division_assignment(expr_component *expr) {
@@ -516,8 +498,6 @@ void compiler::compile_expr_division_assignment(expr_component *expr) {
       expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_modulo_assignment(expr_component *expr) {
@@ -540,8 +520,6 @@ void compiler::compile_expr_modulo_assignment(expr_component *expr) {
       expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_gt(expr_component *expr) {
@@ -555,8 +533,6 @@ void compiler::compile_expr_gt(expr_component *expr) {
                    expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_lt(expr_component *expr) {
@@ -570,8 +546,6 @@ void compiler::compile_expr_lt(expr_component *expr) {
                    expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_gteq(expr_component *expr) {
@@ -585,8 +559,6 @@ void compiler::compile_expr_gteq(expr_component *expr) {
                    expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_lteq(expr_component *expr) {
@@ -600,8 +572,6 @@ void compiler::compile_expr_lteq(expr_component *expr) {
                    expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_equals(expr_component *expr) {
@@ -615,8 +585,6 @@ void compiler::compile_expr_equals(expr_component *expr) {
                    expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_nequals(expr_component *expr) {
@@ -633,8 +601,6 @@ void compiler::compile_expr_nequals(expr_component *expr) {
                    expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_not(expr_component *expr) {
@@ -662,8 +628,6 @@ void compiler::compile_expr_and(expr_component *expr) {
                    expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_expr_or(expr_component *expr) {
@@ -677,8 +641,6 @@ void compiler::compile_expr_or(expr_component *expr) {
                    expr->node->location);
 
   auto result = this->data.push_intermediate(expr);
-  push_instruction(instruction_with_operand_placeholders(op::SET, result),
-                   expr->node->location);
 }
 
 void compiler::compile_statement(std::shared_ptr<ast_node> node) {

@@ -17,7 +17,10 @@ const codeWrapper = document.getElementById("code-wrapper")!;
 // Is changed later
 let onEditorChanged: (update: ViewUpdate) => void = () => {};
 
+const editorContent = localStorage.getItem("source") || "";
+
 const editor = new EditorView({
+  doc: editorContent,
   extensions: [
     basicSetup,
     keymap.of([indentWithTab]),
@@ -143,7 +146,7 @@ setup().then((wrapper) => {
     resetBtn.disabled = false;
   }
 
-  async function locking(callback: () => Promise<void>) {
+  async function locking(callback: () => Promise<void>): Promise<void> {
     lock();
     try {
       await callback();
@@ -153,8 +156,12 @@ setup().then((wrapper) => {
   }
 
   onEditorChanged = (update) => {
-    if (update.docChanged && cpu.getProgram()) {
-      log.textContent = "O código foi alterado desde a última compilação.";
+    if (update.docChanged) {
+      if (cpu.getProgram()) {
+        log.textContent = "O código foi alterado desde a última compilação.";
+      }
+
+      localStorage.setItem("source", update.state.doc.toString());
     }
   };
 
@@ -172,41 +179,44 @@ setup().then((wrapper) => {
     }
   });
 
-  runAllBtn.addEventListener("click", () => {
+  runAllBtn.addEventListener("click", async () => {
     try {
       compileIfNecessary();
 
-      locking(async () => {
+      await locking(async () => {
         await cpu.runProgram();
       });
     } catch (err) {
-      log.textContent = "** Runtime Error ** (f12)";
+      const casterr = err as Error;
+      log.textContent = casterr.message;
       throw err;
     }
   });
 
-  runStatementBtn.addEventListener("click", () => {
+  runStatementBtn.addEventListener("click", async () => {
     try {
       compileIfNecessary();
 
-      locking(async () => {
+      await locking(async () => {
         await cpu.runOneStatement();
       });
     } catch (err) {
-      log.textContent = "** Runtime Error ** (f12)";
+      const casterr = err as Error;
+      log.textContent = casterr.message;
       throw err;
     }
   });
 
-  runInstructionBtn.addEventListener("click", () => {
+  runInstructionBtn.addEventListener("click", async () => {
     try {
       compileIfNecessary();
 
-      locking(async () => {
+      await locking(async () => {
         await cpu.runOneInstruction();
       });
     } catch (err) {
-      log.textContent = "** Runtime Error ** (f12)";
+      const casterr = err as Error;
+      log.textContent = casterr.message;
       throw err;
     }
   });

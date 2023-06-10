@@ -244,8 +244,18 @@ export class MultiplyExecution extends XInstructionExecution {
   }
 }
 
+function formatDivisionByZeroError(cpu: Cpu): string {
+  const instruction = cpu.getPc();
+  const line = cpu.getProgram()!.metadata.sourceLines[Number(instruction)];
+  return `Division by zero! at instruction ${instruction}, line ${line}.`;
+}
+
 export class DivideExecution extends XInstructionExecution {
   async do() {
+    if (this.getX() === 0n) {
+      throw new Error(formatDivisionByZeroError(this.cpu));
+    }
+
     const [addr] = this.operands;
     const y = this.readMem(addr);
 
@@ -256,6 +266,10 @@ export class DivideExecution extends XInstructionExecution {
 
 export class RemainderExecution extends XInstructionExecution {
   async do() {
+    if (this.getX() === 0n) {
+      throw new Error(formatDivisionByZeroError(this.cpu));
+    }
+
     const [addr] = this.operands;
     const y = this.readMem(addr);
 
@@ -295,6 +309,10 @@ export class DivideIExecution extends XInstructionExecution {
   async do() {
     const [value] = this.operands;
 
+    if (value === 0n) {
+      throw new Error(formatDivisionByZeroError(this.cpu));
+    }
+
     this.setX(BigInt.asIntN(64, this.getX() / value));
     this.incPc();
   }
@@ -303,6 +321,11 @@ export class DivideIExecution extends XInstructionExecution {
 export class RemainderIExecution extends XInstructionExecution {
   async do() {
     const [value] = this.operands;
+
+    if (value === 0n) {
+      throw new Error(formatDivisionByZeroError(this.cpu));
+    }
+
     this.setX(BigInt.asIntN(64, this.getX() % value));
     this.incPc();
   }

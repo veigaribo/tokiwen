@@ -51,6 +51,16 @@ std::shared_ptr<address_placeholder> data_manager::pop_intermediate() {
       this->intermediate_value_stack_tip);
 }
 
+std::shared_ptr<address_placeholder> data_manager::peek_intermediate() {
+  auto last = this->intermediate_value_stack.back();
+  return std::make_shared<intermediate_value_address>(
+      this->intermediate_value_stack_tip - last->node->typ->size());
+}
+
+int data_manager::intermediate_stack_size() {
+  return this->intermediate_value_stack.size();
+}
+
 int data_manager::data_size() {
   return this->variable_data_size + this->intermediate_value_data_size;
 }

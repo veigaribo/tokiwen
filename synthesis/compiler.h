@@ -129,6 +129,8 @@ public:
   std::shared_ptr<address_placeholder>
   push_intermediate(expr_component *component);
   std::shared_ptr<address_placeholder> pop_intermediate();
+  std::shared_ptr<address_placeholder> peek_intermediate();
+  int intermediate_stack_size();
 
   int data_size();
 };
