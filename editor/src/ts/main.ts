@@ -57,6 +57,16 @@ const instructionTableEl = document.getElementById("instruction-table")!;
 const registerTableEl = document.getElementById("register-table")!;
 const variableTableEl = document.getElementById("variables-table")!;
 
+const resetModal = document.getElementById("reset-modal")!;
+const modalNoResetBtn = document.getElementById(
+  "no-reset",
+) as HTMLButtonElement;
+const modalResetBtn = document.getElementById("reset2") as HTMLButtonElement;
+const modalCloseBtn = document.getElementById(
+  "close-reset-modal",
+) as HTMLButtonElement;
+let modalResolver: (result: boolean | null) => void = () => {};
+
 const inputEl = document.getElementById("input") as HTMLInputElement;
 const inputBtnEl = document.getElementById("input-btn") as HTMLButtonElement;
 const outputEl = document.getElementById("output") as HTMLInputElement;
@@ -179,9 +189,27 @@ setup().then((wrapper) => {
     }
   });
 
+  function promptResetModal(): Promise<boolean | null> {
+    const promise = new Promise<boolean | null>((resolve) => {
+      modalResolver = resolve;
+    });
+
+    resetModal.style.display = "block";
+    return promise;
+  }
+
   runAllBtn.addEventListener("click", async () => {
     try {
       compileIfNecessary();
+
+      if (cpu.isDone()) {
+        const continu = await promptResetModal();
+
+        if (continu === null) {
+          // Canceled
+          return;
+        }
+      }
 
       await locking(async () => {
         await cpu.runProgram();
@@ -197,6 +225,15 @@ setup().then((wrapper) => {
     try {
       compileIfNecessary();
 
+      if (cpu.isDone()) {
+        const continu = await promptResetModal();
+
+        if (continu === null) {
+          // Canceled
+          return;
+        }
+      }
+
       await locking(async () => {
         await cpu.runOneStatement();
       });
@@ -210,6 +247,15 @@ setup().then((wrapper) => {
   runInstructionBtn.addEventListener("click", async () => {
     try {
       compileIfNecessary();
+
+      if (cpu.isDone()) {
+        const continu = await promptResetModal();
+
+        if (continu === null) {
+          // Canceled
+          return;
+        }
+      }
 
       await locking(async () => {
         await cpu.runOneInstruction();
@@ -239,7 +285,8 @@ setup().then((wrapper) => {
     try {
       reset();
     } catch (err) {
-      log.textContent = "** Runtime Error ** (f12)";
+      const casterr = err as Error;
+      log.textContent = casterr.message;
       throw err;
     }
   });
@@ -311,15 +358,7 @@ setup().then((wrapper) => {
     parser.setKeywordFalse(kwFalseInput.value);
   });
 
-  if (settingsToggled) {
-    // TODO: Make less magical
-    settings.style.height = "83vh";
-    settings.style.display = "block";
-  }
-
-  settingsBtn.addEventListener("click", () => {
-    settingsToggled = !settingsToggled;
-
+  function maybeShowSettings() {
     if (settingsToggled) {
       settings.style.display = "block";
     }
@@ -333,5 +372,42 @@ setup().then((wrapper) => {
         settings.style.display = "none";
       }
     }, 300);
+  }
+
+  function toggleSettings() {
+    settingsToggled = !settingsToggled;
+    maybeShowSettings();
+  }
+
+  maybeShowSettings();
+
+  settingsBtn.addEventListener("click", () => {
+    toggleSettings();
+  });
+
+  function hideResetModal() {
+    resetModal.style.display = "none";
+  }
+
+  modalNoResetBtn.addEventListener("click", () => {
+    hideResetModal();
+    modalResolver(false);
+  });
+
+  modalResetBtn.addEventListener("click", () => {
+    try {
+      reset();
+      hideResetModal();
+      modalResolver(true);
+    } catch (err) {
+      const casterr = err as Error;
+      log.textContent = casterr.message;
+      throw err;
+    }
+  });
+
+  modalCloseBtn.addEventListener("click", () => {
+    modalResolver(null);
+    hideResetModal();
   });
 });

@@ -165,6 +165,14 @@ export class Cpu extends EventEmitter<CpuEvents> {
     return this.output;
   }
 
+  public isDone(): boolean {
+    if (!this.program) {
+      return false;
+    }
+
+    return this.pc >= this.program.instructions.length;
+  }
+
   protected checkForProgram(program: any): asserts program is Program {
     if (!program) {
       throw new Error("Attempted to run program but no program set.");
@@ -180,7 +188,7 @@ export class Cpu extends EventEmitter<CpuEvents> {
   public async runProgram(): Promise<void> {
     this.checkForProgram(this.program);
 
-    while (this.pc < this.program.instructions.length) {
+    while (!this.isDone()) {
       await this.runOneInstruction();
     }
   }
@@ -189,7 +197,7 @@ export class Cpu extends EventEmitter<CpuEvents> {
     this.checkForProgram(this.program);
     const { instructions } = this.program;
 
-    if (this.pc < instructions.length) {
+    if (!this.isDone()) {
       const instruction = instructions[Number(this.pc)];
       await this.runInstruction(instruction);
     }
@@ -219,10 +227,7 @@ export class Cpu extends EventEmitter<CpuEvents> {
 
     do {
       await this.runOneInstruction();
-    } while (
-      !this.instructionIsBoundary[Number(this.pc)] &&
-      this.pc < this.program.instructions.length
-    );
+    } while (!this.instructionIsBoundary[Number(this.pc)] && !this.isDone());
   }
 
   public undoOneInstruction() {

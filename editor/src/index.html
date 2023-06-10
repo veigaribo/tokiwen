@@ -68,6 +68,16 @@
         bottom: 0;
         left: 0;
       }
+      #reset-modal {
+        display: none;
+        padding: 1em;
+        background-color: white;
+        border: 1px solid darkgrey;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
 
       @media screen and (min-width: 1080px) {
         .small-only {
@@ -149,6 +159,17 @@
         </div>
 
         <div id="code-wrapper"></div>
+
+        <div id="reset-modal">
+          <div class="td">
+            <span>O programa está finalizado. Reiniciar?</span>
+            <div class="lr">
+              <button id="close-reset-modal">Cancelar</button>
+              <button id="no-reset">Não reiniciar</button>
+              <button id="reset2">Reiniciar</button>
+            </div>
+          </div>
+        </div>
 
         <div class="lr lr-wrap" id="cockpit">
           <button id="compile">Compilar</button>
