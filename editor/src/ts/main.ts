@@ -300,7 +300,7 @@ setup().then((wrapper) => {
     log.textContent = "";
     const asNumber = parseInt(inputEl.value);
 
-    if (!asNumber) {
+    if (Number.isNaN(asNumber)) {
       const message =
         "Há algo que não é um número no campo de input. Somente números inteiros são suportados no momento.";
       log.textContent = message;
